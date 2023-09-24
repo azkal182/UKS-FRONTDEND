@@ -19,10 +19,18 @@ import { HiPlus, HiPrinter, HiDocumentText } from "react-icons/hi";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  LeadingActions,
+  SwipeableList,
+  SwipeableListItem,
+  SwipeAction,
+  TrailingActions,
+} from "react-swipeable-list";
+import "react-swipeable-list/dist/styles.css";
 
-
-export default function Home() {
+export default function InapPage() {
   const { data: session } = useSession();
+  const [query, setQuery] = useState("");
   const [patient, setPatients] = useState([]);
 
   const getPatients = async () => {
@@ -40,6 +48,25 @@ export default function Home() {
       getPatients();
     }
   }, [session]);
+
+  const leadingActions = () => (
+    <LeadingActions>
+      <SwipeAction onClick={() => console.info("swipe action triggered")}>
+        Action name
+      </SwipeAction>
+    </LeadingActions>
+  );
+
+  const trailingActions = () => (
+    <TrailingActions>
+      <SwipeAction
+        destructive={true}
+        onClick={() => console.info("swipe action triggered")}
+      >
+        Delete
+      </SwipeAction>
+    </TrailingActions>
+  );
 
   return (
     <main>
@@ -75,40 +102,52 @@ export default function Home() {
       </div>
 
       <div className="flex md:hidden items-center justify-between py-4">
-        <Input placeholder="Search" />
+        <Input
+          placeholder="Search"
+          onValueChange={(value) => setQuery(value)}
+        />
       </div>
 
       <div className="block  md:hidden space-y-2">
-        {/* @ts-ignore */}
-        {patient.map((item: any, index: number) => (
-          <Card key={item.id}>
-            <CardBody className="p-2">
-              <div className="flex items-center">
-                <div className="w-8 flex items-center justify-center">
-                  {index + 1}
-                </div>
-                <div className="mr-auto">
-                  <div className="uppercase font-bold">
-                    {item.patient.name} ({item.patient.address})
-                  </div>
-                  <div>
-                    <div className="text-sm capitalize">
-                      {item.patient.hostel}{" "}
-                      <b>
-                        {item.patient.grade
-                          ? ` - kelas (${item.patient.grade})`
-                          : " - (TIDAK SEKOLAH)"}
-                      </b>
+        <SwipeableList>
+          {/* @ts-ignore */}
+          {patient.map((item: any, index: number) => (
+            <SwipeableListItem
+              maxSwipe={1}
+              key={item.id}
+              leadingActions={leadingActions()}
+              trailingActions={trailingActions()}
+            >
+              {/* <Card>
+                <CardBody className="p-2">
+                  <div className="flex items-center">
+                    <div className="w-8 flex items-center justify-center">
+                      {index + 1}
+                    </div>
+                    <div className="mr-auto">
+                      <div className="uppercase font-bold">
+                        {item.patient.name} ({item.patient.address})
+                      </div>
+                      <div>
+                        <div className="text-sm capitalize">
+                          {item.patient.hostel}{" "}
+                          <b>
+                            {item.patient.grade
+                              ? ` - kelas (${item.patient.grade})`
+                              : " - (TIDAK SEKOLAH)"}
+                          </b>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-20 text-center capitalize">
+                      {item.complaint}
                     </div>
                   </div>
-                </div>
-                <div className="w-20 text-center capitalize">
-                  {item.complaint}
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
+                </CardBody>
+              </Card> */}
+            </SwipeableListItem>
+          ))}
+        </SwipeableList>
       </div>
 
       <Table
